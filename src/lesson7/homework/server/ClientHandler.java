@@ -4,6 +4,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class ClientHandler {
     public static final int TIMEOUT = 120 * 1000;
@@ -41,6 +43,22 @@ public class ClientHandler {
     }
 
     public void authentication() throws IOException {
+        Timer timeOut = new Timer(true);
+        timeOut.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    synchronized (this) {
+                        if (name.equals("")) {
+                            System.out.println("Истекло время ожидания подключения!");
+                            socket.close();
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }, TIMEOUT);
 
         while (true) {
             String str = in.readUTF();
